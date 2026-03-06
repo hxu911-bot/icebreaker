@@ -1,5 +1,19 @@
-import OpenAI from 'openai';
+import OpenAI, { APIError } from 'openai';
 import { SenderProfile } from '../profiles/profiles.service';
+import { AppError } from '../../shared/errors';
+
+function handleOpenAIError(err: unknown): never {
+  if (err instanceof APIError) {
+    if (err.status === 401 || err.status === 403) {
+      throw new AppError(422, 'DashScope Key 无效或无权限，请在设置中检查');
+    }
+    if (err.status === 429) {
+      throw new AppError(429, 'DashScope 请求超限，请稍后再试');
+    }
+    throw new AppError(502, `AI 服务错误 (${err.status}): ${err.message}`);
+  }
+  throw err;
+}
 
 type EmailStyle = 'PROFESSIONAL' | 'WARM' | 'CONCISE' | 'STORYTELLING';
 
@@ -79,18 +93,28 @@ ${count > 1 ? `- Each of the ${count} emails should have a distinct angle/hook` 
 
 Return JSON: {"emails": [{"subject": "...", "body": "..."}]}`;
 
-  const response = await openai.chat.completions.create({
-    model: 'qwen-plus',
-    messages: [
-      { role: 'system', content: systemPrompt },
-      { role: 'user', content: userPrompt },
-    ],
-    response_format: { type: 'json_object' },
-    temperature: 0.8,
-  });
+  let response;
+  try {
+    response = await openai.chat.completions.create({
+      model: 'qwen-plus',
+      messages: [
+        { role: 'system', content: systemPrompt },
+        { role: 'user', content: userPrompt },
+      ],
+      response_format: { type: 'json_object' },
+      temperature: 0.8,
+    });
+  } catch (err) {
+    handleOpenAIError(err);
+  }
 
-  const content = response.choices[0]?.message?.content || '{"emails":[]}';
-  const parsed = JSON.parse(content);
+  const content = response!.choices[0]?.message?.content || '{"emails":[]}';
+  let parsed: any;
+  try {
+    parsed = JSON.parse(content);
+  } catch {
+    parsed = { emails: [] };
+  }
 
   const emails: GeneratedEmail[] = (parsed.emails || []).map((e: any, i: number) => ({
     id: `email-${Date.now()}-${i}`,
@@ -109,27 +133,37 @@ export async function translateEmail(
 ): Promise<{ subject: string; body: string }> {
   const openai = createClient(dashscopeKey);
 
-  const response = await openai.chat.completions.create({
-    model: 'qwen-plus',
-    messages: [
-      {
-        role: 'system',
-        content: `You are an expert translator specializing in professional emails. Translate the given email to ${targetLanguage}.
+  let response;
+  try {
+    response = await openai.chat.completions.create({
+      model: 'qwen-plus',
+      messages: [
+        {
+          role: 'system',
+          content: `You are an expert translator specializing in professional emails. Translate the given email to ${targetLanguage}.
 Preserve: tone, personalization details, emotional color, formatting.
 Do NOT translate proper nouns (company names, product names, person names).
 Return ONLY valid JSON: {"subject": "...", "body": "..."}`,
-      },
-      {
-        role: 'user',
-        content: `Translate to ${targetLanguage}:\n\nSubject: ${subject}\n\nBody:\n${body}`,
-      },
-    ],
-    response_format: { type: 'json_object' },
-    temperature: 0.3,
-  });
+        },
+        {
+          role: 'user',
+          content: `Translate to ${targetLanguage}:\n\nSubject: ${subject}\n\nBody:\n${body}`,
+        },
+      ],
+      response_format: { type: 'json_object' },
+      temperature: 0.3,
+    });
+  } catch (err) {
+    handleOpenAIError(err);
+  }
 
-  const content = response.choices[0]?.message?.content || '{}';
-  const parsed = JSON.parse(content);
+  const content = response!.choices[0]?.message?.content || '{}';
+  let parsed: any;
+  try {
+    parsed = JSON.parse(content);
+  } catch {
+    parsed = {};
+  }
   return {
     subject: parsed.subject || subject,
     body: parsed.body || body,
