@@ -41,7 +41,7 @@ export function RegisterPage() {
         <div className="flex flex-col items-center mb-8">
           <div className="flex items-center gap-2 mb-2">
             <Mail className="w-6 h-6 text-sky-600" />
-            <span className="text-xl font-semibold text-gray-900">EmailGen</span>
+            <span className="text-xl font-semibold text-gray-900">Icebreaker</span>
           </div>
           <p className="text-sm text-gray-500">Create your account</p>
         </div>

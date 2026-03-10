@@ -21,7 +21,7 @@ export function AppHeader() {
           className="flex items-center gap-2 font-semibold text-gray-900 hover:text-sky-600 transition-colors"
         >
           <Mail className="w-5 h-5 text-sky-600" />
-          <span>EmailGen</span>
+          <span>Icebreaker</span>
         </button>
 
         <div className="flex items-center gap-3">
