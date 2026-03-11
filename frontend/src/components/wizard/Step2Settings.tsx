@@ -99,8 +99,8 @@ export function Step2Settings() {
                     <span className="text-lg">{style.icon}</span>
                     <span className="font-medium text-sm text-gray-900">{style.name}</span>
                   </div>
-                  {styleStats?.[style.id] != null && (
-                    <span className="text-xs text-gray-400">{styleStats[style.id].toLocaleString()} generated</span>
+                  {styleStats && (
+                    <span className="text-xs text-gray-400">{(styleStats[style.id] ?? 0).toLocaleString()} generated</span>
                   )}
                 </div>
                 <p className="text-xs text-gray-400">{style.scenario}</p>
