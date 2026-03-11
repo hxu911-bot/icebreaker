@@ -12,7 +12,7 @@ export const createProfileSchema = z.object({
 export const updateProfileSchema = createProfileSchema.partial();
 
 export const generateSchema = z.object({
-  candidateText: z.string().min(10).max(6000),
+  candidateText: z.string().min(10).max(10000),
   profileId: z.string().uuid(),
   style: z.enum(['PROFESSIONAL', 'WARM', 'CONCISE', 'STORYTELLING']),
   targetLanguage: z.string().min(2).max(20),

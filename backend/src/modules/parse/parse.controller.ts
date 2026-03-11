@@ -11,7 +11,7 @@ export const parseRouter = Router();
 
 const upload = multer({
   dest: env.UPLOAD_DIR,
-  limits: { fileSize: 10 * 1024 * 1024 },
+  limits: { fileSize: 20 * 1024 * 1024 },
 });
 
 function cleanText(text: string): string {
@@ -20,7 +20,7 @@ function cleanText(text: string): string {
     .replace(/[ \t]+\n/g, '\n')
     .replace(/\n{3,}/g, '\n\n')
     .trim()
-    .substring(0, 4000);
+    .substring(0, 10000);
 }
 
 async function parsePdf(filePath: string): Promise<string> {

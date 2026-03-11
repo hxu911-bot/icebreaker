@@ -75,7 +75,7 @@ Example:
 - Talks at React Conf 2023 about streaming architecture
 - MS CS from Stanford, focus on distributed systems"
             />
-            <p className="text-xs text-gray-400 mt-1">{candidateText.length} / 4000 chars</p>
+            <p className="text-xs text-gray-400 mt-1">{candidateText.length} / 10000 chars</p>
           </div>
         )}
 
