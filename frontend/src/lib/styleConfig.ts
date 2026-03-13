@@ -60,3 +60,23 @@ export const ROLE_LABELS: Record<string, string> = {
   REFERRAL: 'Internal Referral',
   CUSTOM: 'Custom',
 };
+
+export function recommendStyle(candidateText: string, jobTitle: string): EmailStyle {
+  const text = (candidateText + ' ' + jobTitle).toLowerCase();
+  const scores: Record<EmailStyle, number> = { PROFESSIONAL: 0, WARM: 0, CONCISE: 0, STORYTELLING: 0 };
+
+  const keywords: Record<EmailStyle, string[]> = {
+    PROFESSIONAL: ['finance', 'banking', 'consulting', 'executive', 'director', 'vp ', 'cfo', 'coo', 'cto', 'ceo', 'investment', 'legal', '金融', '银行', '咨询', '总监', '副总', '律师'],
+    WARM: ['startup', 'internet', 'mobile', 'app', 'social', 'saas', 'platform', '创业', '互联网', '移动', '平台'],
+    CONCISE: ['engineer', 'developer', 'backend', 'frontend', 'infra', 'cloud', 'algorithm', 'system', 'devops', '工程师', '开发', '架构', '算法', '系统'],
+    STORYTELLING: ['product manager', ' pm ', 'growth', 'marketing', 'brand', 'designer', ' ux', 'operation', '产品经理', '产品', '运营', '市场'],
+  };
+
+  for (const [style, kws] of Object.entries(keywords)) {
+    for (const kw of kws) if (text.includes(kw)) scores[style as EmailStyle]++;
+  }
+
+  const max = Math.max(...Object.values(scores));
+  if (max === 0) return 'WARM';
+  return Object.entries(scores).find(([, v]) => v === max)![0] as EmailStyle;
+}

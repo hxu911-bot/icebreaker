@@ -9,6 +9,7 @@ interface WizardState {
   // Step 2
   selectedProfileId: string;
   selectedStyle: EmailStyle;
+  recommendedStyle: EmailStyle | null;
   targetLanguage: string;
   emailCount: 1 | 2 | 3;
   // Step 3
@@ -21,6 +22,7 @@ interface WizardState {
   setJobTitle: (title: string) => void;
   setProfileId: (id: string) => void;
   setStyle: (style: EmailStyle) => void;
+  setRecommendedStyle: (style: EmailStyle) => void;
   setLanguage: (lang: string) => void;
   setEmailCount: (count: 1 | 2 | 3) => void;
   setGenerating: (v: boolean) => void;
@@ -39,6 +41,7 @@ export const useWizardStore = create<WizardState>((set) => ({
   jobTitle: '',
   selectedProfileId: '',
   selectedStyle: 'WARM',
+  recommendedStyle: null,
   targetLanguage: 'Chinese',
   emailCount: 1,
   generatedEmails: [],
@@ -49,6 +52,15 @@ export const useWizardStore = create<WizardState>((set) => ({
   setJobTitle: (title) => set({ jobTitle: title }),
   setProfileId: (id) => set({ selectedProfileId: id }),
   setStyle: (style) => set({ selectedStyle: style }),
+  setRecommendedStyle: (rec) =>
+    set((state) => {
+      const shouldAutoSelect =
+        state.recommendedStyle === null || state.selectedStyle === state.recommendedStyle;
+      return {
+        recommendedStyle: rec,
+        ...(shouldAutoSelect ? { selectedStyle: rec } : {}),
+      };
+    }),
   setLanguage: (lang) => set({ targetLanguage: lang }),
   setEmailCount: (count) => set({ emailCount: count }),
   setGenerating: (v) => set({ isGenerating: v }),
@@ -76,6 +88,7 @@ export const useWizardStore = create<WizardState>((set) => ({
       jobTitle: '',
       selectedProfileId: '',
       selectedStyle: 'WARM',
+      recommendedStyle: null,
       targetLanguage: 'Chinese',
       emailCount: 1,
       generatedEmails: [],

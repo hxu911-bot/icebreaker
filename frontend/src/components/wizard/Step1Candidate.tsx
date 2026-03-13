@@ -2,12 +2,19 @@ import { useState } from 'react';
 import { ChevronRight, Upload, Type } from 'lucide-react';
 import { useWizardStore } from '../../store/wizard';
 import { FileDropzone } from '../candidate/FileDropzone';
+import { recommendStyle } from '../../lib/styleConfig';
 
 export function Step1Candidate() {
   const [tab, setTab] = useState<'file' | 'text'>('file');
-  const { candidateText, jobTitle, setCandidateText, setJobTitle, nextStep } = useWizardStore();
+  const { candidateText, jobTitle, setCandidateText, setJobTitle, setRecommendedStyle, nextStep } = useWizardStore();
 
   const canContinue = candidateText.trim().length >= 10;
+
+  function handleContinue() {
+    const rec = recommendStyle(candidateText, jobTitle);
+    setRecommendedStyle(rec);
+    nextStep();
+  }
 
   return (
     <div className="max-w-2xl mx-auto space-y-6">
@@ -93,7 +100,7 @@ Example:
 
       <div className="flex justify-end">
         <button
-          onClick={nextStep}
+          onClick={handleContinue}
           disabled={!canContinue}
           className="btn-primary"
         >

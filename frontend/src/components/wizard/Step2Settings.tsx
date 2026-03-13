@@ -7,7 +7,7 @@ import { useQuery } from '@tanstack/react-query';
 
 export function Step2Settings() {
   const {
-    selectedProfileId, selectedStyle, targetLanguage, emailCount,
+    selectedProfileId, selectedStyle, recommendedStyle, targetLanguage, emailCount,
     candidateText, jobTitle,
     setProfileId, setStyle, setLanguage, setEmailCount,
     isGenerating, generateError,
@@ -103,6 +103,11 @@ export function Step2Settings() {
                     <span className="text-xs text-gray-400">{(styleStats[style.id] ?? 0).toLocaleString()} generated</span>
                   )}
                 </div>
+                {recommendedStyle === style.id && (
+                  <span className="inline-flex items-center gap-1 text-xs font-medium text-amber-600 bg-amber-50 px-2 py-0.5 rounded-full mb-1">
+                    ✨ Recommended
+                  </span>
+                )}
                 <p className="text-xs text-gray-400">{style.scenario}</p>
                 <p className="text-xs text-gray-500 mt-1">{style.description}</p>
               </button>
